@@ -23,7 +23,7 @@ themes: []
 applies_to: [] # generalized patterns ("rfp-defense", "client-onboarding")
 source_refs: # cross-scope refs; each entry is qualified
   - scope: pursuit | project | client
-    path: 11.04 NextEra/pursuits/atlas/notes/<file>.md
+    path: <vault-relative path to source note>
     note_id: <nanoid>
 related: [] # other journal entry ids
 ---
