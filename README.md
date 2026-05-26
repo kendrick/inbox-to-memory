@@ -8,6 +8,28 @@ A Claude Code skill for processing raw consulting-work inputs (transcripts, meet
 
 Aligned with the memory-bank schema at [`kendrick-at-slalom/memory-bank`](https://github.com/kendrick-at-slalom/memory-bank). Inspired by, not bound to.
 
+## Why this exists
+
+There's already a memory-bank schema at [`kendrick-at-slalom/memory-bank`](https://github.com/kendrick-at-slalom/memory-bank), with a hydrator agent and a set of `hydrate-*` skills. If you're hydrating a code repo from settled artifacts (existing decisions, ADRs buried in PRs, design docs), use that. Don't use this.
+
+This skill exists for a different job: forward-filling a consulting workspace from raw transcripts and notes. Four things make it a different tool, not the same tool with different defaults.
+
+**A queue, not a backfill.** Drop a transcript into `_inbox/`. Drop a PPTX. Drop a scratch braindump. Drop a half-written email someone forwarded you. Process the queue. The source gets disposed: deleted if text (the verbatim content lives in the groomed note), archived to `attachments/` if binary. The hydrate-* skills point you at existing artifacts. This one drains a queue.
+
+**Groomed notes as the durable thing.** memory-bank treats the source as authoritative and leaves it where it is. Records get extracted; the source stays in your repo. That doesn't fit when your source is a `.vtt` file that's only valuable once it's been processed. Here, every input produces one groomed markdown note: frontmatter on top, extracted sections in the middle, verbatim raw content at the bottom. The note is the searchable artifact in your vault. Records link out from it.
+
+**Cross-client patterns get a home.** memory-bank's scope model is single-tier. Each bank is independent: project, team, or domain. There's no cross-bank concept. Consulting work needs a third tier for patterns that generalize past any one client. This skill adds a `Journal` record type and a cross-client journal directory for that purpose.
+
+**Obsidian-native filenames.** `nanoid -s 10` slug filenames that wiki-link cleanly. No sequential `<ns>-ADR-<n>` IDs (those break under cross-scope nesting). No `uuid` field (Obsidian resolves by filename anyway). Small choices, but they add up when you're working in the vault every day.
+
+## What you'd lose by just using hydrate-*
+
+Honest assessment: strip those four out and you're left with `hydrate-*` wrapped in a different invocation style. The workflow phases, the record schema, the status lifecycle, and the retrieval funnel all match memory-bank's — because we adopted them. You could run `hydrate-extract`, `hydrate-draft`, and the rest one at a time in a manually-arranged directory, and the records would come out looking identical.
+
+What you'd miss is the ergonomics. No inbox UX. No groomed-note artifact. No journal tier. No Obsidian-native filename conventions. The records exist but the conversational substrate they came from doesn't have a first-class home in your vault.
+
+If those ergonomic deltas matter to you, this is the skill. If they don't, `hydrate-*` is enough.
+
 ## Install
 
 ```bash
@@ -23,7 +45,7 @@ Two modes, one skill, decided by the user's phrasing.
 **Process mode** (default):
 
 ```
-> drop a transcript into 11.04 NextEra/pursuits/atlas/notes/_inbox/
+> drop a transcript into /Users/Wherever/Your/Notes/Live/_inbox/
 > "process the inbox"
 ```
 
